@@ -89,6 +89,18 @@ led_config_t g_led_config = { {
 
 bool is_keyboard_master(void) { return is_keyboard_left(); }
 
+void try_usb_wake_up(void) {
+  if (USB_DeviceState == DEVICE_STATE_Suspended &&
+      USB_Device_RemoteWakeupEnabled && suspend_wakeup_condition()) {
+    USB_Device_SendRemoteWakeup();
+    clear_keyboard();
+
+#if USB_SUSPEND_WAKEUP_DELAY > 0
+    wait_ms(USB_SUSPEND_WAKEUP_DELAY);
+#endif
+  }
+}
+
 static int prev_USB_DeviceState = DEVICE_STATE_Unattached;
 
 static void _protocol_pre_task(void) {
@@ -101,6 +113,8 @@ static void _protocol_pre_task(void) {
       suspend_wakeup_init();
     }
     prev_USB_DeviceState = USB_DeviceState;
+
+    try_usb_wake_up();
   }
 }
 
@@ -123,6 +137,8 @@ void protocol_init(void) {
   if (is_keyboard_master()) {
     while (USB_DeviceState != DEVICE_STATE_Configured) {
       USB_USBTask();
+
+      try_usb_wake_up();
     }
 
     prev_USB_DeviceState = USB_DeviceState;
