@@ -23,19 +23,17 @@ enum Layers { L_BASE, L_LOWER, L_RAISE, L_ADJUST, L_Fs };
 #define RSFT_EN RSFT_T(KC_ENT)
 #define LCTL_TB CTL_T(KC_TAB)
 
-#define MTMO_SPC(n) LT(n, KC_SPC)
+#define LSPC0 LT(L_LOWER, KC_SPC)
+#define RSPC0 LT(L_RAISE, KC_ENT)
 
-#define LSPC0 MTMO_SPC(L_LOWER)
-#define RSPC0 MTMO_SPC(L_RAISE)
+#define LSPC1 LT(KC_NO, KC_SPC)
+#define RSPC1 LT(L_ADJUST, KC_ENT)
 
-#define LSPC1 MTMO_SPC(KC_NO)
-#define RSPC1 MTMO_SPC(L_ADJUST)
+#define LSPC2 LT(L_ADJUST, KC_SPC)
+#define RSPC2 LT(KC_NO, KC_ENT)
 
-#define LSPC2 MTMO_SPC(L_ADJUST)
-#define RSPC2 MTMO_SPC(KC_NO)
-
-#define LSPC3 MTMO_SPC(KC_NO)
-#define RSPC3 MTMO_SPC(KC_NO)
+#define LSPC3 LT(KC_NO, KC_SPC)
+#define RSPC3 LT(KC_NO, KC_ENT)
 
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -45,7 +43,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       LCTL_TB,    KC_A,    KC_S,    KC_D,    KC_F,    KC_G,                         KC_H,    KC_J,    KC_K,    KC_L, KC_SCLN, KC_QUOT,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, RSFT_EN,
+      KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_LSFT,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           XXXXXXX, KC_LGUI,   LSPC0,      RSPC0, KC_RALT, MO(L_Fs)
                                       //`--------------------------'  `--------------------------'
