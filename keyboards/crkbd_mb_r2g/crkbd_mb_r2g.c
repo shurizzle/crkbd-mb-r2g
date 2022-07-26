@@ -20,8 +20,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 bool matrix_scan_task(void);
 bool quantum_task(void);
 extern void protocol_post_task(void);
-extern void protocol_pre_init(void);
-extern void protocol_post_init(void);
+void protocol_pre_init(void);
+void protocol_post_init(void);
 
 #ifdef RGB_MATRIX_ENABLE
 
@@ -218,7 +218,7 @@ static void _keyboard_task(void) {
   led_task();
 }
 
-static int prev_USB_DeviceState = DEVICE_STATE_Unattached;
+static int prev_USB_DeviceState = DEVICE_STATE_Configured;
 
 static void _protocol_pre_task(void) {
   if (is_keyboard_master()) {
@@ -234,30 +234,24 @@ static void _protocol_pre_task(void) {
   }
 }
 
-void protocol_task(void) {
-  _protocol_pre_task();
-
-  _keyboard_task();
-
-  protocol_post_task();
-}
-
-void keyboard_post_init_kb(void) {
-  if (is_keyboard_master()) {
-    prev_USB_DeviceState = USB_DeviceState;
-
-    if (USB_DeviceState != DEVICE_STATE_Configured) {
-      suspend_power_down();
-    }
-  }
-
-  keyboard_post_init_user();
-}
-
 void protocol_init(void) {
   protocol_pre_init();
 
   keyboard_init();
 
   protocol_post_init();
+
+  if (is_keyboard_master() && USB_DeviceState != DEVICE_STATE_Configured) {
+#ifdef RGB_MATRIX_ENABLE
+    rgb_matrix_set_suspend_state(true);
+#endif
+  }
+}
+
+void protocol_task(void) {
+  _protocol_pre_task();
+
+  _keyboard_task();
+
+  protocol_post_task();
 }
