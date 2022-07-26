@@ -1,5 +1,10 @@
 # Corne MechBoards R2G
 
+### Why?
+
+Because crkbd/r2g hangs on reset and both firmwares don't have good support for
+USB suspension.
+
 ### Peculiarities
 
 - Uses caterina bootloader but needs dfu flasher.
