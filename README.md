@@ -7,7 +7,7 @@ USB suspension.
 
 ### Peculiarities
 
-- Uses caterina bootloader but needs dfu flasher.
+- Uses caterina bootloader but needs dfu flasher. (Don't need to specify -bl dfu)
 - EE_HANDS handness (dfu-split-{left,right}).
 - Only works on USB on left half.
 
@@ -20,4 +20,4 @@ USB suspension.
 
 #### Following times
 
-On both halves: `qmk flash -kb crkbd_mb_r2g -km via -bl dfu`
+On both halves: `qmk flash -kb crkbd_mb_r2g -km via`
