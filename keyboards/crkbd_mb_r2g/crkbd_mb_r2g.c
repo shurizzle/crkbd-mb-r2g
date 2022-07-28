@@ -103,10 +103,9 @@ static bool _suspend_wakeup_condition(void) {
   return false;
 }
 
-static void _keyboard_task(void) {
-  bool is_suspended =
-      is_keyboard_master() && USB_DeviceState != DEVICE_STATE_Configured;
+bool is_suspended = false;
 
+static void _keyboard_task(void) {
   if (is_suspended) {
     matrix_power_up();
   }
@@ -149,6 +148,7 @@ static void _keyboard_task(void) {
          ) &&
         USB_Device_RemoteWakeupEnabled && _suspend_wakeup_condition()) {
       USB_Device_SendRemoteWakeup();
+      clear_keyboard();
     }
   } else {
 #ifdef OLED_ENABLE
@@ -218,19 +218,15 @@ static void _keyboard_task(void) {
   led_task();
 }
 
-static int prev_USB_DeviceState = DEVICE_STATE_Configured;
-
 static void _protocol_pre_task(void) {
   if (is_keyboard_master()) {
-    if (USB_DeviceState != DEVICE_STATE_Configured &&
-        prev_USB_DeviceState == DEVICE_STATE_Configured) {
+    if (USB_DeviceState != DEVICE_STATE_Configured && !is_suspended) {
       suspend_power_down();
       clear_keyboard();
-    } else if (USB_DeviceState == DEVICE_STATE_Configured &&
-               prev_USB_DeviceState != DEVICE_STATE_Configured) {
+    } else if (USB_DeviceState == DEVICE_STATE_Configured && is_suspended) {
       suspend_wakeup_init();
     }
-    prev_USB_DeviceState = USB_DeviceState;
+    is_suspended = USB_DeviceState != DEVICE_STATE_Configured;
   }
 }
 
@@ -241,10 +237,10 @@ void protocol_init(void) {
 
   protocol_post_init();
 
-  if (is_keyboard_master() && USB_DeviceState != DEVICE_STATE_Configured) {
-#ifdef RGB_MATRIX_ENABLE
-    rgb_matrix_set_suspend_state(true);
-#endif
+  if (is_keyboard_master()) {
+    if ((is_suspended = USB_DeviceState != DEVICE_STATE_Configured)) {
+      suspend_power_down_quantum();
+    }
   }
 }
 

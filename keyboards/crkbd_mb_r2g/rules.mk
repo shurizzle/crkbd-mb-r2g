@@ -29,7 +29,7 @@ BACKLIGHT_ENABLE = no       # Enable keyboard backlight functionality
 RGBLIGHT_ENABLE = no        # Enable keyboard RGB underglow
 RGB_MATRIX_ENABLE = yes
 
-NO_USB_STARTUP_CHECK = yes
+NO_USB_STARTUP_CHECK = no
 
 SPLIT_KEYBOARD = yes
 

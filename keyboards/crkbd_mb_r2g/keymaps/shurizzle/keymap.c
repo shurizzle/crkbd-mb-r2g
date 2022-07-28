@@ -113,6 +113,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                           XXXXXXX, XXXXXXX, XXXXXXX,     KC_SPC,    KC_K,    KC_F
                                       //`--------------------------'  `--------------------------'
   ),
+#if 0
   [L_LENGHT] = LAYOUT(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
@@ -124,6 +125,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                           XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
+#endif
 };
 // clang-format on
 
@@ -137,14 +139,14 @@ const char *const LAYER_NAMES[] = {"DEF", "LOW", "RAI", "ADJ", "Fs", "MED"};
 
 void oled_render_layer_state_r2g(void) {
   static size_t len = sizeof(LAYER_NAMES) / sizeof(LAYER_NAMES[0]);
-  static char layer_num[3] = {0};
+  static char buf[3] = {0};
 
   size_t i = get_highest_layer(layer_state);
   if (i < len) {
     oled_write_ln(LAYER_NAMES[i], false);
   } else {
-    snprintf(layer_num, 2, "%02x", i);
-    oled_write_ln(layer_num, false);
+    snprintf(buf, 3, "%02x", i);
+    oled_write_ln(buf, false);
   }
 }
 
