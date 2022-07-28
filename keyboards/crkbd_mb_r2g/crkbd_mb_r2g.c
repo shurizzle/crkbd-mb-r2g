@@ -19,9 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 bool matrix_scan_task(void);
 bool quantum_task(void);
-extern void protocol_post_task(void);
+void protocol_post_task(void);
 void protocol_pre_init(void);
 void protocol_post_init(void);
+
+bool is_suspended = false;
 
 #ifdef RGB_MATRIX_ENABLE
 
@@ -103,8 +105,6 @@ static bool _suspend_wakeup_condition(void) {
   return false;
 }
 
-bool is_suspended = false;
-
 static void _keyboard_task(void) {
   if (is_suspended) {
     matrix_power_up();
@@ -141,12 +141,8 @@ static void _keyboard_task(void) {
 #endif
 
   if (is_suspended) {
-    if ((matrix_changed
-#ifdef ENCODER_ENABLE
-         || encoders_changed
-#endif
-         ) &&
-        USB_Device_RemoteWakeupEnabled && _suspend_wakeup_condition()) {
+    if (matrix_changed && USB_Device_RemoteWakeupEnabled &&
+        _suspend_wakeup_condition()) {
       USB_Device_SendRemoteWakeup();
       clear_keyboard();
     }
@@ -220,13 +216,16 @@ static void _keyboard_task(void) {
 
 static void _protocol_pre_task(void) {
   if (is_keyboard_master()) {
-    if (USB_DeviceState != DEVICE_STATE_Configured && !is_suspended) {
+    bool next_is_suspended = USB_DeviceState != DEVICE_STATE_Configured;
+
+    if (next_is_suspended && !is_suspended) {
       suspend_power_down();
       clear_keyboard();
-    } else if (USB_DeviceState == DEVICE_STATE_Configured && is_suspended) {
+    } else if (!next_is_suspended && is_suspended) {
       suspend_wakeup_init();
     }
-    is_suspended = USB_DeviceState != DEVICE_STATE_Configured;
+
+    is_suspended = next_is_suspended;
   }
 }
 

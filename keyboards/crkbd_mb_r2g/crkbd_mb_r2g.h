@@ -39,3 +39,5 @@
 
 
 #define LAYOUT LAYOUT_split_3x6_3
+
+extern bool is_suspended;
