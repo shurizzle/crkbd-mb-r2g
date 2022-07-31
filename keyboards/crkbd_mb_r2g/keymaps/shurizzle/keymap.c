@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
-enum Layers { L_BASE, L_LOWER, L_RAISE, L_ADJUST, L_Fs, L_MEDIA, L_LENGHT };
+enum Layers { L_BASE, L_LOWER, L_RAISE, L_ADJUST, L_FS, L_MEDIA, L_LENGHT };
 
 #define RSFT_EN RSFT_T(KC_ENT)
 #define LCTL_TB CTL_T(KC_TAB)
@@ -50,7 +50,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_LSFT,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, KC_LGUI,   LSPC0,      RSPC0, KC_RALT, MO(L_Fs)
+                                          XXXXXXX, KC_LGUI,   LSPC0,      RSPC0, KC_RALT, MO(L_FS)
                                       //`--------------------------'  `--------------------------'
 
   ),
@@ -91,9 +91,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                       //`--------------------------'  `--------------------------'
   ),
 
-  [L_Fs] = LAYOUT(
+  [L_FS] = LAYOUT(
   //,-----------------------------------------------------.                    ,-----------------------------------------------------.
-      T_MEDIA, XXXXXXX,   KC_F1,   KC_F2,   KC_F3,   KC_F4,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+      XXXXXXX, XXXXXXX,   KC_F1,   KC_F2,   KC_F3,   KC_F4,                      T_MEDIA, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       XXXXXXX, XXXXXXX,   KC_F5,   KC_F6,   KC_F7,   KC_F8,                      XXXXXXX, TB_PREV, TB_NEXT, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
