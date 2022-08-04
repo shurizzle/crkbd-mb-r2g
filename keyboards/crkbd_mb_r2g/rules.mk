@@ -2,14 +2,7 @@
 MCU = atmega32u4
 
 # Bootloader selection
-BOOTLOADER = custom
-
-OPT_DEFS += -DBOOTLOADER_CATERINA
-BOOTLOADER_TYPE = caterina
-
-BOOTLOADER_SIZE = 4096
-
-PROGRAM_CMD = $(call EXEC_DFU)
+BOOTLOADER = atmel-dfu
 
 # Build Options
 #   change yes to no to disable
