@@ -1,5 +1,7 @@
 # Corne MechBoards R2G
 
+![crkbd](/.github/pictures/crkbd.jpg)
+
 ### Why?
 
 Because crkbd/r2g hangs on reset and both firmwares don't have good support for
