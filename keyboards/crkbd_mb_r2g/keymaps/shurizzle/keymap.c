@@ -18,6 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include QMK_KEYBOARD_H
 
+#include "shurizzle.h"
+
 enum Layers { L_BASE, L_LOWER, L_RAISE, L_ADJUST, L_FS, L_MEDIA, L_LENGHT };
 
 #define RSFT_EN RSFT_T(KC_ENT)
@@ -50,7 +52,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT,    KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,                         KC_N,    KC_M, KC_COMM,  KC_DOT, KC_SLSH, KC_LSFT,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, KC_LGUI,   LSPC0,      RSPC0, KC_RALT, MO(L_FS)
+                                          KC_LALT, KC_LGUI,   LSPC0,      RSPC0, KC_RALT, MO(L_FS)
                                       //`--------------------------'  `--------------------------'
 
   ),
@@ -63,7 +65,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX,  KC_DOT, XXXXXXX, KC_TILD,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, KC_LGUI,   LSPC1,      RSPC1, KC_RALT, XXXXXXX
+                                          KC_LALT, KC_LGUI,   LSPC1,      RSPC1, KC_RALT, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -75,7 +77,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       KC_LSFT, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, KC_TILD,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, KC_LGUI,   LSPC2,      RSPC2, KC_RALT, XXXXXXX
+                                          KC_LALT, KC_LGUI,   LSPC2,      RSPC2, KC_RALT, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -87,7 +89,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       RGB_MOD, RGB_HUD, RGB_SAD, RGB_VAD, KC_VOLD, KC_MPRV,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, KC_LGUI,   LSPC3,      RSPC3, KC_RALT, XXXXXXX
+                                          KC_LALT, KC_LGUI,   LSPC3,      RSPC3, KC_RALT, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
 
@@ -99,7 +101,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       XXXXXXX, XXXXXXX,   KC_F9,  KC_F10,  KC_F11,  KC_F12,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX
+                                          KC_LALT, XXXXXXX, XXXXXXX,    XXXXXXX, XXXXXXX, XXXXXXX
                                       //`--------------------------'  `--------------------------'
   ),
   [L_MEDIA] = LAYOUT(
@@ -110,7 +112,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, KC_VOLD, KC_MPRV,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
-                                          XXXXXXX, XXXXXXX, XXXXXXX,     KC_SPC,    KC_K,    KC_F
+                                          KC_LALT, XXXXXXX, XXXXXXX,     KC_SPC,    KC_K,    KC_F
                                       //`--------------------------'  `--------------------------'
   ),
 #if 0
@@ -137,11 +139,15 @@ oled_rotation_t oled_init_kb(oled_rotation_t rotation) {
 
 const char *const LAYER_NAMES[] = {"DEF", "LOW", "RAI", "ADJ", "Fs", "MED"};
 
-void oled_render_layer_state_r2g(void) {
+extern uint8_t oled_buffer[OLED_MATRIX_SIZE];
+extern uint8_t *oled_cursor;
+
+static inline void oled_render_layer_state_r2g(void) {
   static size_t len = sizeof(LAYER_NAMES) / sizeof(LAYER_NAMES[0]);
   static char buf[3] = {0};
 
   size_t i = get_highest_layer(layer_state);
+  oled_set_cursor(0, 0);
   if (i < len) {
     oled_write_ln(LAYER_NAMES[i], false);
   } else {
@@ -150,9 +156,50 @@ void oled_render_layer_state_r2g(void) {
   }
 }
 
-void oled_render_logo_r2g(void) {
+static void oled_render_layer(void) {
+  static const char PROGMEM gear[] = {
+      0,   0,   0,   0,   0,   0,   0,   0,   224, 240, 240, 240, 224, 192, 192,
+      192, 224, 248, 248, 248, 248, 128, 0,   0,   0,   0,   0,   0,   0,   0,
+      0,   0,   0,   0,   0,   120, 120, 248, 248, 252, 254, 255, 255, 31,  15,
+      7,   7,   7,   7,   7,   7,   15,  31,  255, 255, 254, 255, 255, 31,  14,
+      0,   0,   0,   0,   0,   0,   0,   0,   112, 240, 255, 255, 127, 255, 255,
+      248, 240, 224, 224, 224, 224, 224, 224, 240, 248, 255, 255, 127, 31,  31,
+      31,  30,  14,  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,
+      0,   1,   31,  31,  31,  31,  7,   3,   3,   3,   7,   15,  15,  15,  7,
+      0,   0,   0,   0,   0,   0,   0,   0,
+  };
+  static const char PROGMEM full[] = {
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      255, 255, 255, 255, 255, 255, 255, 255,
+  };
+
+  oled_clear();
+  switch (get_highest_layer(layer_state)) {
+  case L_FS:
+    oled_cursor =
+        &oled_buffer[(OLED_DISPLAY_WIDTH - 32) / 8 / 2 * OLED_DISPLAY_HEIGHT];
+    oled_write_raw_P(full, sizeof(full));
+    break;
+  case L_ADJUST:
+    oled_cursor =
+        &oled_buffer[(OLED_DISPLAY_WIDTH - 32) / 8 / 2 * OLED_DISPLAY_HEIGHT];
+    oled_write_raw_P(gear, sizeof(gear));
+    break;
+  default:
+    oled_render_layer_state_r2g();
+  }
+}
+
+static void oled_render_logo_r2g(void) {
   // clang-format off
-    static const char PROGMEM mb_logo[] = {
+  static const char PROGMEM mb_logo[] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x0f, 0x0f, 0x0f, 0x0f,
@@ -195,7 +242,7 @@ bool oled_task_kb(void) {
     return false;
   }
   if (is_keyboard_master()) {
-    oled_render_layer_state_r2g();
+    oled_render_layer();
   } else {
     oled_render_logo_r2g();
   }

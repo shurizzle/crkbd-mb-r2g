@@ -1,0 +1,13 @@
+diff --git a/quantum/keyboard.c b/quantum/keyboard.c
+index ec2f2e4496..cee72dfb92 100644
+--- a/quantum/keyboard.c
++++ b/quantum/keyboard.c
+@@ -456,7 +456,7 @@ static inline void generate_tick_event(void) {
+  * @return true Matrix did change
+  * @return false Matrix didn't change
+  */
+-static bool matrix_task(void) {
++bool matrix_task(void) {
+     if (!matrix_can_read()) {
+         generate_tick_event();
+         return false;

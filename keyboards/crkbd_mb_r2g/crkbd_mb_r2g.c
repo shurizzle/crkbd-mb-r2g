@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "crkbd_mb_r2g.h"
 
-bool matrix_scan_task(void);
+bool matrix_task(void);
 bool quantum_task(void);
 void protocol_post_task(void);
 void protocol_pre_init(void);
@@ -109,7 +109,7 @@ static void _keyboard_task(void) {
   if (is_suspended) {
     matrix_power_up();
   }
-  bool matrix_changed = matrix_scan_task();
+  bool matrix_changed = matrix_task();
   (void)matrix_changed;
   if (is_suspended) {
     matrix_power_down();
@@ -150,13 +150,7 @@ static void _keyboard_task(void) {
 #ifdef OLED_ENABLE
     oled_task();
 #if OLED_TIMEOUT > 0
-    // Wake up oled if user is using those fabulous keys or spinning those
-    // encoders!
-    if (matrix_changed
-#ifdef ENCODER_ENABLE
-        || encoders_changed
-#endif
-    )
+    if (matrix_changed)
       oled_on();
 #endif
 #endif

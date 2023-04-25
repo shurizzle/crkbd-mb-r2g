@@ -17,6 +17,8 @@ jobs:
         run: cd qmk_firmware && make git-submodule
       - name: Link firmware
         run: ln -s ../../keyboards/crkbd_mb_r2g qmk_firmware/keyboards/crkbd_mb_r2g
+      - name: Apply patch
+        run: cd qmk_firmware && patch -Np1 < ../matrix_task.diff
       - name: Compile firmware
         run: cd qmk_firmware && make crkbd_mb_r2g:shurizzle
       - name: Upload compiled firmware (build artifact)
