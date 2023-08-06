@@ -134,28 +134,28 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 static char *const LAYER_NAMES[] = {"DEF", "LOW", "RAI", "ADJ", "Fs", "MED"};
 
 static inline void oled_render_layer_state(void) {
-    static size_t len    = sizeof(LAYER_NAMES) / sizeof(LAYER_NAMES[0]);
-    static char   buf[3] = {0};
+  static size_t len = sizeof(LAYER_NAMES) / sizeof(LAYER_NAMES[0]);
+  static char buf[3] = {0};
 
-    size_t i = get_highest_layer(layer_state);
-    oled_set_cursor(0, 0);
-    if (i < len) {
-        oled_write_ln(LAYER_NAMES[i], false);
-    } else {
-        snprintf(buf, 3, "%02x", i);
-        oled_write_ln(buf, false);
-    }
+  size_t i = get_highest_layer(layer_state);
+  oled_set_cursor(0, 0);
+  if (i < len) {
+    oled_write_ln(LAYER_NAMES[i], false);
+  } else {
+    snprintf(buf, 3, "%02x", i);
+    oled_write_ln(buf, false);
+  }
 }
 
 void oled_render_keylog_r2g(void);
 
 bool oled_task_user(void) {
-    if (is_keyboard_master()) {
-        oled_render_layer_state();
-        // oled_render_keylog_r2g();
-        return false;
-    } else {
-        return true;
-    }
+  if (is_keyboard_master()) {
+    oled_render_layer_state();
+    // oled_render_keylog_r2g();
+    return false;
+  } else {
+    return true;
+  }
 }
 #endif // OLED_ENABLE
