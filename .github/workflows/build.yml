@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Clone qmk
         run: git clone https://github.com/qmk/qmk_firmware.git
       - name: Install qmk deps
@@ -20,7 +20,7 @@ jobs:
       - name: Compile firmware
         run: cd qmk_firmware && qmk compile -kb crkbd/r2g -km shurizzle
       - name: Upload compiled firmware (build artifact)
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Keychron crkbd r2g QMK Firmware
           path: qmk_firmware/crkbd_r2g_shurizzle.hex
