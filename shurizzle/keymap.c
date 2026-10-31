@@ -17,7 +17,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include QMK_KEYBOARD_H
-#include <stdio.h>
 
 enum Layers { L_BASE, L_LOWER, L_RAISE, L_ADJUST, L_FS, L_MEDIA, L_LENGHT };
 
@@ -157,7 +156,10 @@ static inline void oled_render_layer_state(void) {
   if (i < len) {
     oled_write_ln(LAYER_NAMES[i], false);
   } else {
-    snprintf(buf, 3, "%02x", i);
+    // hand-rolled hex: snprintf would pull in ~1.3 KB of printf
+    static const char hex[] = "0123456789abcdef";
+    buf[0] = hex[(i >> 4) & 0xF];
+    buf[1] = hex[i & 0xF];
     oled_write_ln(buf, false);
   }
 
@@ -199,7 +201,9 @@ void matrix_scan_user(void) {
   if (is_mouse_jiggle_active) {
     if (timer_elapsed(mouse_jiggle_timer) > MOUSE_JIGGLE_INTERVAL_MS) {
       mouse_jiggle_timer = timer_read();
-      tap_code16(mouse_jiggle_direction ? MS_LEFT : MS_RGHT);
+      // raw mouse report: same 8 px step as mousekey, without its code
+      report_mouse_t report = {.x = mouse_jiggle_direction ? -8 : 8};
+      host_mouse_send(&report);
       mouse_jiggle_direction = !mouse_jiggle_direction;
     }
   }

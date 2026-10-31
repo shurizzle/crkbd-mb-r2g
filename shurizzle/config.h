@@ -52,4 +52,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGBLIGHT_VAL_STEP 17
 #endif
 
-#define OLED_FONT_H "keyboards/crkbd/lib/glcdfont.c"
+// ASCII-only font (32..126) to save flash
+#define OLED_FONT_H "keyboards/crkbd/keymaps/shurizzle/font.c"
+#define OLED_FONT_START 32
+#define OLED_FONT_END 126
