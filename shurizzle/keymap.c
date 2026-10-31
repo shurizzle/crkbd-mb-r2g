@@ -21,6 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 enum Layers { L_BASE, L_LOWER, L_RAISE, L_ADJUST, L_FS, L_MEDIA, L_LENGHT };
 
+enum custom_keycodes {
+  M_JIGL = QK_USER_0,
+};
+
 #define RSFT_EN RSFT_T(KC_ENT)
 #define LCTL_TB CTL_T(KC_TAB)
 
@@ -86,7 +90,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
       UG_TOGG, UG_HUEU, UG_SATU, UG_VALU, KC_MUTE, KC_MPLY,                      KC_HOME, KC_PGDN, KC_PGUP,  KC_END, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------|                    |--------+--------+--------+--------+--------+--------|
-      UG_NEXT, UG_HUED, UG_SATD, UG_VALD, KC_VOLD, KC_MPRV,                      XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+      UG_NEXT, UG_HUED, UG_SATD, UG_VALD, KC_VOLD, KC_MPRV,                       M_JIGL, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
   //|--------+--------+--------+--------+--------+--------+--------|  |--------+--------+--------+--------+--------+--------+--------|
                                           KC_LALT, KC_LGUI,   LSPC3,      RSPC3, KC_RALT, XXXXXXX
                                       //`--------------------------'  `--------------------------'
@@ -130,8 +134,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+#define MOUSE_JIGGLE_INTERVAL_MS 15000 // how often to move the mouse
+
+static bool is_mouse_jiggle_active = false;
+static bool mouse_jiggle_direction = false; // used to alternate direction
+static uint16_t mouse_jiggle_timer = 0;
+
 #ifdef OLED_ENABLE
 static char *const LAYER_NAMES[] = {"DEF", "LOW", "RAI", "ADJ", "Fs", "MED"};
+
+// 8x8 bell icon rotated 90deg CW, column-major for SSD1306 GDDRAM
+static const char bell_icon[] PROGMEM = {0x00, 0x3C, 0xFF, 0xFF,
+                                         0x7E, 0x3C, 0x3C, 0x18};
+static const char bell_blank[sizeof(bell_icon)] PROGMEM = {0};
 
 static inline void oled_render_layer_state(void) {
   static size_t len = sizeof(LAYER_NAMES) / sizeof(LAYER_NAMES[0]);
@@ -145,6 +160,12 @@ static inline void oled_render_layer_state(void) {
     snprintf(buf, 3, "%02x", i);
     oled_write_ln(buf, false);
   }
+
+  // col is in characters (6 px), so col 20 = pixel 120; line 3 = rows 24..31.
+  // oled_write_raw_P skips unchanged bytes, so writing every frame is cheap.
+  oled_set_cursor(20, 3);
+  oled_write_raw_P(is_mouse_jiggle_active ? bell_icon : bell_blank,
+                   sizeof(bell_icon));
 }
 
 void oled_render_keylog_r2g(void);
@@ -159,3 +180,27 @@ bool oled_task_user(void) {
   }
 }
 #endif // OLED_ENABLE
+
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  switch (keycode) {
+  case M_JIGL:
+    if (record->event.pressed) {
+      is_mouse_jiggle_active = !is_mouse_jiggle_active;
+      if (is_mouse_jiggle_active)
+        mouse_jiggle_timer = timer_read();
+    }
+    return false;
+  }
+
+  return true;
+}
+
+void matrix_scan_user(void) {
+  if (is_mouse_jiggle_active) {
+    if (timer_elapsed(mouse_jiggle_timer) > MOUSE_JIGGLE_INTERVAL_MS) {
+      mouse_jiggle_timer = timer_read();
+      tap_code16(mouse_jiggle_direction ? MS_LEFT : MS_RGHT);
+      mouse_jiggle_direction = !mouse_jiggle_direction;
+    }
+  }
+}
